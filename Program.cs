@@ -48,8 +48,28 @@ namespace PdfCopy
 			Func<string, string> fixSpacedApostraphes = s => Regex.Replace(s, @" (\u2019) ", "$1");
 			Func<string, string> fixSpacedQuotes = s => Regex.Replace(s, @" (?<x>\u201d)|(?<x>\u201c) ", "$1");
             Func<string, string> ManInRevolt = s => s;// Regex.Replace(s, " (?<x>[;:])| ?(?<x>\u2014) ?", "$1");
+            Func<string, string> JourneyOfModernTheology = s => Regex.Replace(s, @"(?<![.!?]) \.(?! ?\.)", ".");
             var inp = Clipboard.GetText();
-            var ret = fixSpacedQuotes(fixSpacedApostraphes(ManInRevolt(FixInterWordSpacing(/*makeEndnote*/(removeSomeEndnoteSpaces(fixEndnotes(fixParen(fixHyphen(fixEmDash(fixSoftHyphens(stripNewlines(ConvertFirstLineAllCaps(inp)).Trim())))))))))));
+            var modifications = new Func<string, string>[]
+            {
+                ConvertFirstLineAllCaps,
+                s => stripNewlines(s).Trim(),
+                fixSoftHyphens,
+                fixEmDash,
+                fixHyphen,
+                fixParen,
+                fixEndnotes,
+                removeSomeEndnoteSpaces,
+                makeEndnote,
+                FixInterWordSpacing,
+                ManInRevolt,
+                fixSpacedApostraphes,
+                fixSpacedQuotes,
+                JourneyOfModernTheology,
+            };
+            var ret = inp;
+            foreach (var f in modifications)
+                ret = f(ret);
             //string debug = "justifi";
             //Clipboard.SetText(string.Join(" ", ret.Substring(ret.IndexOf(debug) + debug.Length - 2, 7).Select(c => string.Format("0x{0:x} ('{1}')", (int)c, c)).ToArray()));
             Clipboard.SetText(ret);
