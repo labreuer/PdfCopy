@@ -23,6 +23,7 @@ namespace PdfCopy
             // \u2019 is single curved right quotation mark
             // \u201d is double curved right quotation mark
             // (Book Title, 2010) <- don't want to change that to (Book Title,[2010])
+            // avoid doing this to years by assuming footnotes will be 1-3 digits only
             Func<string, string> fixEndnotes = s => Regex.Replace(s, @"
                 (?<=
                   (?<!\d)[,]
@@ -36,7 +37,7 @@ namespace PdfCopy
                   |
                   \d\.
                 )
-                (\d+)
+                (\d{1,3})
                 (?![.:]\d|\w|:)", "[$1]", RegexOptions.IgnorePatternWhitespace); // second line was (?<!\d)[:,]
 			Func<string, string> removeSomeEndnoteSpaces = s => Regex.Replace(s, @"(?<=[.""'\u2019\u201d]) (\[\d+\])", "$1");
             Func<string, string> stripNewlines = s => Regex.Replace(s, @"\s*\r?\n", " ");
