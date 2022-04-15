@@ -46,7 +46,7 @@ namespace PdfCopy
             Func<string, string> fixParen = s => Regex.Replace(s, @"\( ([^()]+[^ ])\)", "($1)");
             Func<string, string> makeEndnote = s => Regex.Replace(s, @"^\s*(\d+)\. ", "[$1] ");
             Func<string, string> fixSoftHyphens = s => Regex.Replace(s, @"\u00ad ?", "");
-			Func<string, string> fixSpacedApostrophes = s => Regex.Replace(s, @" (?<x>\u2019)|(?<x>\u2018) ", "$1");
+			Func<string, string> fixSpacedApostrophes = s => Regex.Replace(s, @" ?(?<x>\u2019) (?=s\W)| (?<x>\u2019)|(?<x>\u2018) ", "$1");
 			Func<string, string> fixSpacedQuotes = s => Regex.Replace(s, @" (?<x>\u201d)|(?<x>\u201c) ", "$1");
             Func<string, string> ManInRevolt = s => s;// Regex.Replace(s, " (?<x>[;:])| ?(?<x>\u2014) ?", "$1");
             Func<string, string> JourneyOfModernTheology = s => Regex.Replace(s, @"(?<![.!?]) \.(?! ?\.)", ".");
