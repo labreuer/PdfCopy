@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System.Text;
 
 namespace PdfCopy
 {
@@ -59,6 +59,7 @@ namespace PdfCopy
                 fixEmDash,
                 fixHyphen,
                 fixParen,
+                FixNumberUnicode,
                 fixEndnotes,
                 removeSomeEndnoteSpaces,
                 makeEndnote,
@@ -202,6 +203,36 @@ namespace PdfCopy
             return nl.Success
                 ? firstLine + nl.Value + rest
                 : firstLine;
+        }
+
+        // The following book uses weird characters for numbers:
+        //
+        // C:\Users\labreuer\Dropbox\spash\Chang 22 Realism for Realistic People_ A New Pragmatist Philosophy of Science.pdf
+        //
+        // According to https://unicodeplus.com/U+F643 , this is the "Private Use Area" and thus might be idiosyncratic to that book ...
+        //
+        // The following PowerShell fixes it:
+        /*
+        $zero = 63043
+        $s = Get-Clipboard -Raw
+        $ret = ""
+        for ($i = 0; $i -lt $s.Length; $i++) {
+            $u64 = [UInt64]$s[$i]
+            if ($zero -le $u64 -and $u64 -le ($zero + 9)) {
+                $ret += ($u64 - $zero).ToString()
+            } else {
+                $ret += $s[$i]
+            }
+        }
+        $ret | Set-Clipboard
+        */
+        private static string FixNumberUnicode(string s)
+        {
+            const UInt32 Zero = 63043;
+            var sb = new StringBuilder(s.Length);
+            foreach (var c in s)
+                sb.Append(Zero <= c && c <= Zero + 9 ? (c - Zero).ToString()[0] : c);
+            return sb.ToString();
         }
     }
 }
